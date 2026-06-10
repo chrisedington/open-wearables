@@ -38,6 +38,7 @@ from app.schemas.responses.activity import (
     SleepStagesSummary,
     SleepSummary,
 )
+from app.services.activity_merge import merge_activity_rows
 from app.schemas.utils import (
     PaginatedResponse,
     Pagination,
@@ -478,8 +479,12 @@ class SummariesService:
         # Merge archived data when archival is enabled
         results = self._merge_archive_activity(db_session, user_id, start_date, end_date, results)
 
-        # Filter by priority to get best source per date
-        results = self._filter_by_priority(db_session, user_id, results, date_key="activity_date")
+        # Merge sources per date, field-wise by priority. Winner-takes-all
+        # (_filter_by_priority) is wrong here: a Watch on its charger still
+        # emits a row (steps_sum=0) that would mask the phone's real steps.
+        provider_order = ProviderPriorityRepository(ProviderPriority).get_priority_order(db_session)
+        device_type_order = DeviceTypePriorityRepository().get_priority_order(db_session)
+        results, fallback_keys_by_date = merge_activity_rows(results, provider_order, device_type_order)
 
         # Get workout aggregates (elevation, distance, energy from workouts)
         workout_aggregates = self.event_record_repo.get_daily_workout_aggregates(
@@ -594,11 +599,14 @@ class SummariesService:
         # Transform to schema
         data = []
         for result in results:
-            # Look up workout data for this day/provider/device
+            # Look up workout / minutes data for this day: try each contributing
+            # source in priority order, so a watch with no step samples doesn't
+            # blank the phone's active-minutes for the day.
             result_key = (result["activity_date"], result["source"], result.get("device_model"))
-            workout_data = workout_lookup.get(result_key, {})
-            activity_data = activity_lookup.get(result_key, {})
-            intensity_data = intensity_lookup.get(result_key, {})
+            day_keys = fallback_keys_by_date.get(result["activity_date"], [result_key])
+            workout_data = next((workout_lookup[k] for k in day_keys if k in workout_lookup), {})
+            activity_data = next((activity_lookup[k] for k in day_keys if k in activity_lookup), {})
+            intensity_data = next((intensity_lookup[k] for k in day_keys if k in intensity_lookup), {})
 
             # Get elevation from workouts
             elevation_meters = workout_data.get("elevation_meters")

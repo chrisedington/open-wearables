@@ -5,6 +5,7 @@ Tests the full import flow for Apple HealthKit data via SDK.
 """
 
 import logging
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -16,6 +17,7 @@ from sqlalchemy.orm import Session
 from app.models import EventRecord, WorkoutDetails
 from app.schemas.enums import SeriesType
 from app.schemas.providers.mobile_sdk import SyncRequest as SDKSyncRequest
+from app.schemas.providers.mobile_sdk import WorkoutStatistic
 from app.services.apple.healthkit.import_service import ImportService
 from tests.factories import UserFactory
 
@@ -558,11 +560,11 @@ class TestSDKImportUnitConversion:
         return ImportService(log=logging.getLogger("test"))
 
     @staticmethod
-    def _record(metric_type: str, value: float) -> dict[str, Any]:
+    def _record(metric_type: str, value: float, unit: str = "") -> dict[str, Any]:
         return {
             "id": f"test-{metric_type}",
             "type": metric_type,
-            "unit": "",
+            "unit": unit,
             "value": value,
             "startDate": "2025-04-10T12:00:00Z",
             "endDate": "2025-04-10T12:00:00Z",
@@ -662,6 +664,22 @@ class TestSDKImportUnitConversion:
         assert samples[0].series_type == SeriesType.height
         assert samples[0].value == Decimal("175.2600")
 
+    def test_apple_walking_step_length_converted_meters_to_centimeters(
+        self,
+        import_service: ImportService,
+    ) -> None:
+        """Apple Health sends walking step length in meters — canonical storage is cm."""
+        user_id = str(uuid4())
+        request = self._build_request(
+            "apple",
+            [self._record("HKQuantityTypeIdentifierWalkingStepLength", 0.72, unit="m")],
+        )
+        samples = import_service._build_statistic_bundles(request, user_id)
+
+        assert len(samples) == 1
+        assert samples[0].series_type == SeriesType.walking_step_length
+        assert samples[0].value == Decimal("72.00")
+
     def test_apple_dietary_water_converted_liters_to_hydration_milliliters(
         self,
         import_service: ImportService,
@@ -677,3 +695,23 @@ class TestSDKImportUnitConversion:
         assert len(samples) == 1
         assert samples[0].series_type == SeriesType.hydration
         assert samples[0].value == Decimal("1250.00")
+
+    def test_apple_workout_stride_length_converted_meters_to_centimeters(
+        self,
+        import_service: ImportService,
+    ) -> None:
+        """Apple workout statistics send running stride length in meters; canonical storage is cm."""
+        _, samples, _ = import_service._extract_metrics_from_workout_stats(
+            [WorkoutStatistic(type="averageRunningStrideLength", unit="m", value=0.918)],
+            user_uuid=uuid4(),
+            device_model="Apple Watch",
+            software_version="10.0",
+            end_date=datetime(2026, 5, 17, 11, 59, 47, tzinfo=timezone.utc),
+            zone_offset=None,
+            provider="apple",
+            source_name="Apple Watch",
+        )
+
+        assert len(samples) == 1
+        assert samples[0].series_type == SeriesType.running_stride_length
+        assert samples[0].value == Decimal("91.800")

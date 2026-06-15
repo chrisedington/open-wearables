@@ -37,6 +37,26 @@ from app.utils.structured_logging import log_structured
 from .device_resolution import extract_device_info
 from .sleep_service import handle_sleep_data
 
+APPLE_METER_TO_CENTIMETER_SERIES_TYPES = {
+    SeriesType.walking_step_length,
+    SeriesType.running_stride_length,
+}
+
+
+def _canonicalize_apple_series_value(
+    provider: str,
+    series_type: SeriesType,
+    unit: str | None,
+    value: Decimal,
+) -> Decimal:
+    if (
+        provider == "apple"
+        and series_type in APPLE_METER_TO_CENTIMETER_SERIES_TYPES
+        and (unit or "").lower() in {"m", "meter", "meters"}
+    ):
+        return value * 100
+    return value
+
 
 class ImportService:
     def __init__(
@@ -138,6 +158,7 @@ class ImportService:
                 value = value * 100
             if series_type == SeriesType.hydration and (rjson.unit or "").lower() in {"l", "liter", "liters"}:
                 value = value * 1000
+            value = _canonicalize_apple_series_value(provider, series_type, rjson.unit, value)
 
             # Extract device info
             device_model, software_version, original_source_name = extract_device_info(rjson.source)
@@ -205,6 +226,7 @@ class ImportService:
             series_type = get_series_type_from_workout_statistic_type(stat.type)
 
             if series_type:
+                value = _canonicalize_apple_series_value(provider, series_type, stat.unit, value)
                 sample = TimeSeriesSampleCreate(
                     id=uuid4(),
                     external_id=None,

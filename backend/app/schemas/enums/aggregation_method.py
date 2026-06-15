@@ -112,6 +112,10 @@ AGGREGATION_METHOD_BY_TYPE: dict[SeriesType, AggregationMethod] = {
     SeriesType.number_of_times_fallen: AggregationMethod.SUM,
     SeriesType.number_of_alcoholic_beverages: AggregationMethod.SUM,
     SeriesType.nike_fuel: AggregationMethod.SUM,
+    SeriesType.dietary_energy: AggregationMethod.SUM,
+    SeriesType.dietary_carbohydrates: AggregationMethod.SUM,
+    SeriesType.dietary_protein: AggregationMethod.SUM,
+    SeriesType.dietary_fat_total: AggregationMethod.SUM,
 }
 
 

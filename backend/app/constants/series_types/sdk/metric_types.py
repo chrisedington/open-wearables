@@ -128,6 +128,10 @@ class SDKMetricType(StrEnum):
     NUMBER_OF_TIMES_FALLEN = "HKQuantityTypeIdentifierNumberOfTimesFallen"
     INHALER_USAGE = "HKQuantityTypeIdentifierInhalerUsage"
     NUMBER_OF_ALCOHOLIC_BEVERAGES = "HKQuantityTypeIdentifierNumberOfAlcoholicBeverages"
+    APPLE_DIETARY_ENERGY_CONSUMED = "HKQuantityTypeIdentifierDietaryEnergyConsumed"
+    APPLE_DIETARY_CARBOHYDRATES = "HKQuantityTypeIdentifierDietaryCarbohydrates"
+    APPLE_DIETARY_PROTEIN = "HKQuantityTypeIdentifierDietaryProtein"
+    APPLE_DIETARY_FAT_TOTAL = "HKQuantityTypeIdentifierDietaryFatTotal"
     APPLE_DIETARY_WATER = "HKQuantityTypeIdentifierDietaryWater"
     ANDROID_HYDRATION = "HYDRATION"
 
@@ -287,6 +291,10 @@ METRIC_TYPE_TO_SERIES_TYPE: dict[SDKMetricType, SeriesType] = {
     SDKMetricType.NUMBER_OF_TIMES_FALLEN: SeriesType.number_of_times_fallen,
     SDKMetricType.INHALER_USAGE: SeriesType.inhaler_usage,
     SDKMetricType.NUMBER_OF_ALCOHOLIC_BEVERAGES: SeriesType.number_of_alcoholic_beverages,
+    SDKMetricType.APPLE_DIETARY_ENERGY_CONSUMED: SeriesType.dietary_energy,
+    SDKMetricType.APPLE_DIETARY_CARBOHYDRATES: SeriesType.dietary_carbohydrates,
+    SDKMetricType.APPLE_DIETARY_PROTEIN: SeriesType.dietary_protein,
+    SDKMetricType.APPLE_DIETARY_FAT_TOTAL: SeriesType.dietary_fat_total,
     SDKMetricType.APPLE_DIETARY_WATER: SeriesType.hydration,
     SDKMetricType.ANDROID_HYDRATION: SeriesType.hydration,
     # Electrodermal

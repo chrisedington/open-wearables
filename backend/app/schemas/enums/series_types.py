@@ -166,6 +166,10 @@ class SeriesType(str, Enum):
     number_of_alcoholic_beverages = "number_of_alcoholic_beverages"
     nike_fuel = "nike_fuel"
     hydration = "hydration"
+    dietary_energy = "dietary_energy"
+    dietary_carbohydrates = "dietary_carbohydrates"
+    dietary_protein = "dietary_protein"
+    dietary_fat_total = "dietary_fat_total"
 
 
 # =============================================================================
@@ -306,6 +310,10 @@ SERIES_TYPE_DEFINITIONS: list[tuple[int, SeriesType, str]] = [
     (505, SeriesType.number_of_alcoholic_beverages, "count"),
     (506, SeriesType.nike_fuel, "count"),
     (507, SeriesType.hydration, "mL"),
+    (508, SeriesType.dietary_energy, "kcal"),
+    (509, SeriesType.dietary_carbohydrates, "g"),
+    (510, SeriesType.dietary_protein, "g"),
+    (511, SeriesType.dietary_fat_total, "g"),
 ]
 
 

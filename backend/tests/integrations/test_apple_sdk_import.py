@@ -712,6 +712,36 @@ class TestSDKImportUnitConversion:
         assert samples[0].series_type == SeriesType.hydration
         assert samples[0].value == Decimal("1250.00")
 
+    def test_apple_dietary_macros_map_to_nutrition_series(
+        self,
+        import_service: ImportService,
+    ) -> None:
+        """Apple Health nutrition quantities must not be dropped by the SDK import path."""
+        user_id = str(uuid4())
+        request = self._build_request(
+            "apple",
+            [
+                self._record("HKQuantityTypeIdentifierDietaryEnergyConsumed", 640, unit="kcal"),
+                self._record("HKQuantityTypeIdentifierDietaryCarbohydrates", 72, unit="g"),
+                self._record("HKQuantityTypeIdentifierDietaryProtein", 34, unit="g"),
+                self._record("HKQuantityTypeIdentifierDietaryFatTotal", 21, unit="g"),
+            ],
+        )
+        samples = import_service._build_statistic_bundles(request, user_id)
+
+        assert [sample.series_type for sample in samples] == [
+            SeriesType.dietary_energy,
+            SeriesType.dietary_carbohydrates,
+            SeriesType.dietary_protein,
+            SeriesType.dietary_fat_total,
+        ]
+        assert [sample.value for sample in samples] == [
+            Decimal("640"),
+            Decimal("72"),
+            Decimal("34"),
+            Decimal("21"),
+        ]
+
     def test_apple_workout_stride_length_converted_meters_to_centimeters(
         self,
         import_service: ImportService,

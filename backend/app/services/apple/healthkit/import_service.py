@@ -40,6 +40,7 @@ from .sleep_service import handle_sleep_data
 APPLE_METER_TO_CENTIMETER_SERIES_TYPES = {
     SeriesType.walking_step_length,
     SeriesType.running_stride_length,
+    SeriesType.waist_circumference,
 }
 
 

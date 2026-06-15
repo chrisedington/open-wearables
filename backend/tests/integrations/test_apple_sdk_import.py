@@ -680,6 +680,22 @@ class TestSDKImportUnitConversion:
         assert samples[0].series_type == SeriesType.walking_step_length
         assert samples[0].value == Decimal("72.00")
 
+    def test_apple_waist_circumference_converted_meters_to_centimeters(
+        self,
+        import_service: ImportService,
+    ) -> None:
+        """Apple Health sends waist circumference in meters — canonical storage is cm."""
+        user_id = str(uuid4())
+        request = self._build_request(
+            "apple",
+            [self._record("HKQuantityTypeIdentifierWaistCircumference", 0.84, unit="m")],
+        )
+        samples = import_service._build_statistic_bundles(request, user_id)
+
+        assert len(samples) == 1
+        assert samples[0].series_type == SeriesType.waist_circumference
+        assert samples[0].value == Decimal("84.00")
+
     def test_apple_dietary_water_converted_liters_to_hydration_milliliters(
         self,
         import_service: ImportService,

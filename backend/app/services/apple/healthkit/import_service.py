@@ -43,6 +43,13 @@ APPLE_METER_TO_CENTIMETER_SERIES_TYPES = {
     SeriesType.waist_circumference,
 }
 
+APPLE_CATEGORY_VALUE_SERIES_TYPES = {
+    SeriesType.menstrual_flow,
+    SeriesType.cervical_mucus_quality,
+    SeriesType.ovulation_test_result,
+    SeriesType.sexual_activity,
+}
+
 
 def _canonicalize_apple_series_value(
     provider: str,
@@ -141,25 +148,32 @@ class ImportService:
         provider = request.provider
 
         for rjson in request.data.records:
-            value = Decimal(str(rjson.value))
-
             record_type = rjson.type or ""
             series_type = get_series_type_from_metric_type(record_type)
 
             if not series_type:
                 continue
+
+            if series_type == SeriesType.mindful_minutes:
+                duration_seconds = max((rjson.endDate - rjson.startDate).total_seconds(), 0)
+                value = Decimal(str(duration_seconds)) / Decimal("60")
+            else:
+                value = Decimal(str(rjson.value))
+
             # Convert meters -> centimeters for height (both HealthKit and Health Connect report meters)
             # and ratio (0..1) -> percent for Apple body_fat_percentage (HealthKit HKUnit.percent()).
             # Android Health Connect's BodyFatRecord.percentage is already in percent, so only scale
             # body_fat_percentage for provider == "apple" — otherwise Google/Samsung values are stored
             # ~100x too large. Hydration is stored in mL, but HealthKit dietary water is serialized in liters.
+            # HealthKit reproductive category samples are integer enum values; preserve them verbatim.
             if series_type == SeriesType.height or (
                 series_type == SeriesType.body_fat_percentage and provider == "apple"
             ):
                 value = value * 100
             if series_type == SeriesType.hydration and (rjson.unit or "").lower() in {"l", "liter", "liters"}:
                 value = value * 1000
-            value = _canonicalize_apple_series_value(provider, series_type, rjson.unit, value)
+            if series_type not in APPLE_CATEGORY_VALUE_SERIES_TYPES:
+                value = _canonicalize_apple_series_value(provider, series_type, rjson.unit, value)
 
             # Extract device info
             device_model, software_version, original_source_name = extract_device_info(rjson.source)

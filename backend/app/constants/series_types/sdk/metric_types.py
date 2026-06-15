@@ -107,6 +107,13 @@ class SDKMetricType(StrEnum):
     WORKOUT_EFFORT_SCORE = "HKQuantityTypeIdentifierWorkoutEffortScore"
     ESTIMATED_WORKOUT_EFFORT_SCORE = "HKQuantityTypeIdentifierEstimatedWorkoutEffortScore"
 
+    # Category samples
+    APPLE_MINDFUL_SESSION = "HKCategoryTypeIdentifierMindfulSession"
+    APPLE_MENSTRUAL_FLOW = "HKCategoryTypeIdentifierMenstrualFlow"
+    APPLE_CERVICAL_MUCUS_QUALITY = "HKCategoryTypeIdentifierCervicalMucusQuality"
+    APPLE_OVULATION_TEST_RESULT = "HKCategoryTypeIdentifierOvulationTestResult"
+    APPLE_SEXUAL_ACTIVITY = "HKCategoryTypeIdentifierSexualActivity"
+
     # Apple-specific Activity Metrics
     APPLE_MOVE_TIME = "HKQuantityTypeIdentifierAppleMoveTime"
     APPLE_SLEEPING_WRIST_TEMPERATURE = "HKQuantityTypeIdentifierAppleSleepingWristTemperature"
@@ -297,6 +304,12 @@ METRIC_TYPE_TO_SERIES_TYPE: dict[SDKMetricType, SeriesType] = {
     SDKMetricType.APPLE_DIETARY_FAT_TOTAL: SeriesType.dietary_fat_total,
     SDKMetricType.APPLE_DIETARY_WATER: SeriesType.hydration,
     SDKMetricType.ANDROID_HYDRATION: SeriesType.hydration,
+    # Category samples
+    SDKMetricType.APPLE_MINDFUL_SESSION: SeriesType.mindful_minutes,
+    SDKMetricType.APPLE_MENSTRUAL_FLOW: SeriesType.menstrual_flow,
+    SDKMetricType.APPLE_CERVICAL_MUCUS_QUALITY: SeriesType.cervical_mucus_quality,
+    SDKMetricType.APPLE_OVULATION_TEST_RESULT: SeriesType.ovulation_test_result,
+    SDKMetricType.APPLE_SEXUAL_ACTIVITY: SeriesType.sexual_activity,
     # Electrodermal
     SDKMetricType.ELECTRODERMAL_ACTIVITY: SeriesType.electrodermal_activity,
     # Ultraviolet Exposure

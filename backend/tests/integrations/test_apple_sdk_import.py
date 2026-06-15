@@ -560,14 +560,20 @@ class TestSDKImportUnitConversion:
         return ImportService(log=logging.getLogger("test"))
 
     @staticmethod
-    def _record(metric_type: str, value: float, unit: str = "") -> dict[str, Any]:
+    def _record(
+        metric_type: str,
+        value: float,
+        unit: str = "",
+        start_date: str = "2025-04-10T12:00:00Z",
+        end_date: str = "2025-04-10T12:00:00Z",
+    ) -> dict[str, Any]:
         return {
             "id": f"test-{metric_type}",
             "type": metric_type,
             "unit": unit,
             "value": value,
-            "startDate": "2025-04-10T12:00:00Z",
-            "endDate": "2025-04-10T12:00:00Z",
+            "startDate": start_date,
+            "endDate": end_date,
             "source": {
                 "name": "Test Device",
                 "bundleIdentifier": "test",
@@ -740,6 +746,59 @@ class TestSDKImportUnitConversion:
             Decimal("72"),
             Decimal("34"),
             Decimal("21"),
+        ]
+
+    def test_apple_mindful_session_maps_interval_to_minutes(
+        self,
+        import_service: ImportService,
+    ) -> None:
+        """Apple mindful sessions are category intervals — store the real duration, not enum value 0."""
+        user_id = str(uuid4())
+        request = self._build_request(
+            "apple",
+            [
+                self._record(
+                    "HKCategoryTypeIdentifierMindfulSession",
+                    0,
+                    start_date="2025-04-10T12:00:00Z",
+                    end_date="2025-04-10T12:15:30Z",
+                ),
+            ],
+        )
+        samples = import_service._build_statistic_bundles(request, user_id)
+
+        assert len(samples) == 1
+        assert samples[0].series_type == SeriesType.mindful_minutes
+        assert samples[0].value == Decimal("15.5")
+
+    def test_apple_reproductive_categories_preserve_category_values(
+        self,
+        import_service: ImportService,
+    ) -> None:
+        """HealthKit reproductive category records should be persisted instead of dropped."""
+        user_id = str(uuid4())
+        request = self._build_request(
+            "apple",
+            [
+                self._record("HKCategoryTypeIdentifierMenstrualFlow", 3),
+                self._record("HKCategoryTypeIdentifierCervicalMucusQuality", 2),
+                self._record("HKCategoryTypeIdentifierOvulationTestResult", 1),
+                self._record("HKCategoryTypeIdentifierSexualActivity", 1),
+            ],
+        )
+        samples = import_service._build_statistic_bundles(request, user_id)
+
+        assert [sample.series_type for sample in samples] == [
+            SeriesType.menstrual_flow,
+            SeriesType.cervical_mucus_quality,
+            SeriesType.ovulation_test_result,
+            SeriesType.sexual_activity,
+        ]
+        assert [sample.value for sample in samples] == [
+            Decimal("3"),
+            Decimal("2"),
+            Decimal("1"),
+            Decimal("1"),
         ]
 
     def test_apple_workout_stride_length_converted_meters_to_centimeters(

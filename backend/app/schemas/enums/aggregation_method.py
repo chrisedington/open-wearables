@@ -116,6 +116,11 @@ AGGREGATION_METHOD_BY_TYPE: dict[SeriesType, AggregationMethod] = {
     SeriesType.dietary_carbohydrates: AggregationMethod.SUM,
     SeriesType.dietary_protein: AggregationMethod.SUM,
     SeriesType.dietary_fat_total: AggregationMethod.SUM,
+    SeriesType.mindful_minutes: AggregationMethod.SUM,
+    SeriesType.menstrual_flow: AggregationMethod.AVG,
+    SeriesType.cervical_mucus_quality: AggregationMethod.AVG,
+    SeriesType.ovulation_test_result: AggregationMethod.AVG,
+    SeriesType.sexual_activity: AggregationMethod.AVG,
 }
 
 

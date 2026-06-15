@@ -170,6 +170,11 @@ class SeriesType(str, Enum):
     dietary_carbohydrates = "dietary_carbohydrates"
     dietary_protein = "dietary_protein"
     dietary_fat_total = "dietary_fat_total"
+    mindful_minutes = "mindful_minutes"
+    menstrual_flow = "menstrual_flow"
+    cervical_mucus_quality = "cervical_mucus_quality"
+    ovulation_test_result = "ovulation_test_result"
+    sexual_activity = "sexual_activity"
 
 
 # =============================================================================
@@ -314,6 +319,11 @@ SERIES_TYPE_DEFINITIONS: list[tuple[int, SeriesType, str]] = [
     (509, SeriesType.dietary_carbohydrates, "g"),
     (510, SeriesType.dietary_protein, "g"),
     (511, SeriesType.dietary_fat_total, "g"),
+    (512, SeriesType.mindful_minutes, "minutes"),
+    (513, SeriesType.menstrual_flow, "category"),
+    (514, SeriesType.cervical_mucus_quality, "category"),
+    (515, SeriesType.ovulation_test_result, "category"),
+    (516, SeriesType.sexual_activity, "category"),
 ]
 
 

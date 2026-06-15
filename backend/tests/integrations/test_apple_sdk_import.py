@@ -550,6 +550,7 @@ class TestSDKImportUnitConversion:
     Apple HealthKit reports `body_fat_percentage` via `HKUnit.percent()` as a 0..1 ratio,
     while Android Health Connect's `BodyFatRecord.percentage` is already in percent.
     Height in meters is consistent across both platforms and must always be converted to cm.
+    Hydration is stored in mL, while Apple Health dietary water is serialized in liters.
     """
 
     @pytest.fixture
@@ -660,3 +661,19 @@ class TestSDKImportUnitConversion:
         assert len(samples) == 1
         assert samples[0].series_type == SeriesType.height
         assert samples[0].value == Decimal("175.2600")
+
+    def test_apple_dietary_water_converted_liters_to_hydration_milliliters(
+        self,
+        import_service: ImportService,
+    ) -> None:
+        """Apple Health sends dietary water in liters — hydration is stored in mL."""
+        user_id = str(uuid4())
+        request = self._build_request(
+            "apple",
+            [self._record("HKQuantityTypeIdentifierDietaryWater", 1.25)],
+        )
+        samples = import_service._build_statistic_bundles(request, user_id)
+
+        assert len(samples) == 1
+        assert samples[0].series_type == SeriesType.hydration
+        assert samples[0].value == Decimal("1250.00")

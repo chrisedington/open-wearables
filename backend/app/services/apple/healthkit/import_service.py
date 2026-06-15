@@ -131,11 +131,13 @@ class ImportService:
             # and ratio (0..1) -> percent for Apple body_fat_percentage (HealthKit HKUnit.percent()).
             # Android Health Connect's BodyFatRecord.percentage is already in percent, so only scale
             # body_fat_percentage for provider == "apple" — otherwise Google/Samsung values are stored
-            # ~100x too large.
+            # ~100x too large. Hydration is stored in mL, but HealthKit dietary water is serialized in liters.
             if series_type == SeriesType.height or (
                 series_type == SeriesType.body_fat_percentage and provider == "apple"
             ):
                 value = value * 100
+            if series_type == SeriesType.hydration and (rjson.unit or "").lower() in {"l", "liter", "liters"}:
+                value = value * 1000
 
             # Extract device info
             device_model, software_version, original_source_name = extract_device_info(rjson.source)

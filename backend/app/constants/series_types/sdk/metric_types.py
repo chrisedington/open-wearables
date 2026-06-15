@@ -128,6 +128,7 @@ class SDKMetricType(StrEnum):
     NUMBER_OF_TIMES_FALLEN = "HKQuantityTypeIdentifierNumberOfTimesFallen"
     INHALER_USAGE = "HKQuantityTypeIdentifierInhalerUsage"
     NUMBER_OF_ALCOHOLIC_BEVERAGES = "HKQuantityTypeIdentifierNumberOfAlcoholicBeverages"
+    APPLE_DIETARY_WATER = "HKQuantityTypeIdentifierDietaryWater"
     ANDROID_HYDRATION = "HYDRATION"
 
     # Electrodermal
@@ -286,6 +287,7 @@ METRIC_TYPE_TO_SERIES_TYPE: dict[SDKMetricType, SeriesType] = {
     SDKMetricType.NUMBER_OF_TIMES_FALLEN: SeriesType.number_of_times_fallen,
     SDKMetricType.INHALER_USAGE: SeriesType.inhaler_usage,
     SDKMetricType.NUMBER_OF_ALCOHOLIC_BEVERAGES: SeriesType.number_of_alcoholic_beverages,
+    SDKMetricType.APPLE_DIETARY_WATER: SeriesType.hydration,
     SDKMetricType.ANDROID_HYDRATION: SeriesType.hydration,
     # Electrodermal
     SDKMetricType.ELECTRODERMAL_ACTIVITY: SeriesType.electrodermal_activity,

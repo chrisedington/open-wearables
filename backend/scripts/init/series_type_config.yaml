@@ -110,6 +110,11 @@ series_types:
     min_value: 10
     max_value: 120
 
+  move_time:
+    cadence: daily
+    min_value: 20
+    max_value: 240
+
   time_in_daylight:
     cadence: daily
     min_value: 15

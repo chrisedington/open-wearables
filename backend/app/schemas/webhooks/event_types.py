@@ -137,6 +137,7 @@ class WebhookEventType(StrEnum):
     # Activity basic
     SERIES_STAND_TIME = "series.stand_time.created"
     SERIES_EXERCISE_TIME = "series.exercise_time.created"
+    SERIES_MOVE_TIME = "series.move_time.created"
     SERIES_PHYSICAL_EFFORT = "series.physical_effort.created"
     SERIES_FLIGHTS_CLIMBED = "series.flights_climbed.created"
     SERIES_AVERAGE_MET = "series.average_met.created"
@@ -267,6 +268,7 @@ EVENT_TYPE_DESCRIPTIONS: dict[WebhookEventType, str] = {
     WebhookEventType.SERIES_BASAL_ENERGY: "Basal energy samples were ingested.",
     WebhookEventType.SERIES_STAND_TIME: "Stand time samples were ingested.",
     WebhookEventType.SERIES_EXERCISE_TIME: "Exercise time samples were ingested.",
+    WebhookEventType.SERIES_MOVE_TIME: "Move time samples were ingested.",
     WebhookEventType.SERIES_PHYSICAL_EFFORT: "Physical effort samples were ingested.",
     WebhookEventType.SERIES_FLIGHTS_CLIMBED: "Flights climbed samples were ingested.",
     WebhookEventType.SERIES_AVERAGE_MET: "Average MET samples were ingested.",
@@ -387,6 +389,7 @@ EVENT_TYPE_GROUPS: dict[str, list[str]] = {
     WebhookEventType.ACTIVITY_CREATED_TIMESERIES: [
         WebhookEventType.SERIES_STAND_TIME,
         WebhookEventType.SERIES_EXERCISE_TIME,
+        WebhookEventType.SERIES_MOVE_TIME,
         WebhookEventType.SERIES_PHYSICAL_EFFORT,
         WebhookEventType.SERIES_FLIGHTS_CLIMBED,
         WebhookEventType.SERIES_AVERAGE_MET,

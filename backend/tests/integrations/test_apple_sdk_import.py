@@ -581,8 +581,8 @@ class TestSDKImportUnitConversion:
         }
 
     def _build_request(self, provider: str, records: list[dict[str, Any]]) -> SDKSyncRequest:
-        return SDKSyncRequest(
-            **{
+        return SDKSyncRequest.model_validate(
+            {
                 "provider": provider,
                 "sdkVersion": "1.0.0",
                 "syncTimestamp": "2025-04-10T12:00:00Z",
@@ -747,6 +747,22 @@ class TestSDKImportUnitConversion:
             Decimal("34"),
             Decimal("21"),
         ]
+
+    def test_apple_move_time_maps_to_distinct_series_type(
+        self,
+        import_service: ImportService,
+    ) -> None:
+        """Apple Move Time must not collapse into Apple Exercise Time."""
+        user_id = str(uuid4())
+        request = self._build_request(
+            "apple",
+            [self._record("HKQuantityTypeIdentifierAppleMoveTime", 42, unit="min")],
+        )
+        samples = import_service._build_statistic_bundles(request, user_id)
+
+        assert len(samples) == 1
+        assert samples[0].series_type == SeriesType.move_time
+        assert samples[0].value == Decimal("42")
 
     def test_apple_mindful_session_maps_interval_to_minutes(
         self,

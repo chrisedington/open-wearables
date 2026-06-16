@@ -247,7 +247,7 @@ METRIC_TYPE_TO_SERIES_TYPE: dict[SDKMetricType, SeriesType] = {
     SDKMetricType.FLIGHTS_CLIMBED: SeriesType.flights_climbed,
     SDKMetricType.ANDROID_FLOORS_CLIMBED: SeriesType.flights_climbed,
     SDKMetricType.PHYSICAL_EFFORT: SeriesType.physical_effort,
-    SDKMetricType.APPLE_MOVE_TIME: SeriesType.exercise_time,
+    SDKMetricType.APPLE_MOVE_TIME: SeriesType.move_time,
     # Activity - Distance
     SDKMetricType.ANDROID_DISTANCE: SeriesType.distance_walking_running,
     SDKMetricType.DISTANCE_WALKING_RUNNING: SeriesType.distance_walking_running,
